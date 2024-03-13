@@ -3,25 +3,21 @@ package metamusic.service.index;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import io.quarkus.runtime.Shutdown;
-import jakarta.inject.Inject;
-import metamusic.config.Config;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
-
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
 
 public class ElasticSearchSearchService implements SearchService {
     private static final Logger logger = Logger.getLogger(ElasticSearchSearchService.class);
 
     private final ElasticsearchClient esClient;
 
-    public ElasticSearchSearchService(ElasticsearchClient client) {
-        this.esClient = client;
+    public ElasticSearchSearchService(ElasticsearchClient elasticsearchClient) {
+        this.esClient = elasticsearchClient;
     }
 
     @Override
@@ -40,7 +36,6 @@ public class ElasticSearchSearchService implements SearchService {
     }
 
 
-    @Shutdown
     public void close() {
         esClient.shutdown();
     }
@@ -55,10 +50,11 @@ public class ElasticSearchSearchService implements SearchService {
                             )
                     , FileDescriptor.class
             );
-            return  response.hits().hits().stream().map(h -> h.source()).toList();
+            return  response.hits().hits().stream().map(Hit::source).toList();
         } catch (IOException e) {
             logger.error( "Error searching", e);
-            return null;
+//            TODO: custom exception
+            return Collections.emptyList();
         }
     }
 }

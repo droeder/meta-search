@@ -1,5 +1,6 @@
 package metamusic.service.index;
 
+
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -13,21 +14,25 @@ import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
+import org.jboss.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.logging.Logger;
 
-import static java.util.logging.Level.INFO;
 @Singleton
 public class ElasticSearchFactory {
 
-    @Inject
-    private Config config;
 
-    private static final Logger logger = Logger.getLogger(ElasticSearchFactory.class.getName());
+    private static final Logger logger = Logger.getLogger(ElasticSearchFactory.class);
+
+    private final Config config;
+
+    @Inject
+    public ElasticSearchFactory(Config config) {
+        this.config = config;
+    }
 
     @Produces
     @Singleton
@@ -43,7 +48,7 @@ public class ElasticSearchFactory {
                 .build();
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
-        logger.log(INFO, String.format("Connection with client established: %s ", client.info()));
+        logger.info(String.format("Connection with client established: %s ", client.info()));
         return new ElasticSearchSearchService(client);
     }
 
