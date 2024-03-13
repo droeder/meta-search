@@ -14,12 +14,14 @@ import java.util.List;
 
 
 @Path("/index")
+@SuppressWarnings("unused")
 public class IndexController {
     private final SearchService searchService;
     private final MetadataService extractorService;
     private final Config config;
 
     @Inject
+    @SuppressWarnings("unused")
     public IndexController(SearchService searchService, MetadataService extractorService, Config config) {
         this.searchService = searchService;
         this.extractorService = extractorService;
@@ -28,8 +30,10 @@ public class IndexController {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public void index() {
+    @SuppressWarnings("unused")
+    public String index() {
         List<FileDescriptor> fileDescriptors = extractorService.extractMetadata(config.getSourcePaths());
         fileDescriptors.forEach(descriptor -> searchService.index(config.indexName, descriptor));
+        return "ok";
     }
 }

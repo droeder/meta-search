@@ -4,11 +4,11 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import metamusic.service.ServiceException;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.List;
 
 public class ElasticSearchSearchService implements SearchService {
@@ -26,7 +26,7 @@ public class ElasticSearchSearchService implements SearchService {
         try {
             IndexResponse response = esClient.index(i -> i
                     .index(indexName)
-                    .id(descriptor.uuid().toString())
+                    .id(descriptor.id())
                     .document(descriptor)
             );
             logger.info(MessageFormat.format("Indexed with version {0}", response.version()));
@@ -40,9 +40,9 @@ public class ElasticSearchSearchService implements SearchService {
         esClient.shutdown();
     }
 
+
     @Override
-    public List<FileDescriptor> search(String indexName, String searchTerm2) {
-        final String searchTerm = "vinicius";
+    public List<FileDescriptor> search(String indexName, String searchTerm) {
         try {
             SearchResponse<FileDescriptor> response = esClient.search(s -> s
                             .index(indexName)
@@ -52,9 +52,7 @@ public class ElasticSearchSearchService implements SearchService {
             );
             return  response.hits().hits().stream().map(Hit::source).toList();
         } catch (IOException e) {
-            logger.error( "Error searching", e);
-//            TODO: custom exception
-            return Collections.emptyList();
+            throw new ServiceException(e);
         }
     }
 }

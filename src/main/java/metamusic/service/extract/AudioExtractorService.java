@@ -1,26 +1,33 @@
 package metamusic.service.extract;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import metamusic.service.ServiceException;
 import metamusic.service.index.FileDescriptor;
+import metamusic.service.index.HashService;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jboss.logging.Logger;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @ApplicationScoped
+@SuppressWarnings("unused")
 public class AudioExtractorService implements MetadataService {
 
-    private static final Logger logger =  Logger.getLogger(AudioExtractorService.class.getName());
-//TODO: maybe use streams for processing all files
+    private static final Logger logger =  Logger.getLogger(AudioExtractorService.class);
+
+
     @Override
     public List<FileDescriptor> extractMetadata(List<Path> sources) {
         List<FileDescriptor> result = new ArrayList<>();
@@ -31,7 +38,7 @@ public class AudioExtractorService implements MetadataService {
             else if (source.isFile()){
                 processFile(source, result);
             } else {
-                logger.log(Level.WARNING, "File ignored: " + source.getAbsolutePath());
+                logger.warn("File ignored: {}" + source.getAbsolutePath());
             }
         }
         return result;
@@ -54,16 +61,24 @@ public class AudioExtractorService implements MetadataService {
 
     private void processFile(File child, List<FileDescriptor> result) {
         if (!child.exists()){
-            logger.log(Level.WARNING, "File does not exist: " + child.getAbsolutePath());
+            logger.warn("File does not exist: " + child.getAbsolutePath());
         }
         if (!child.getName().endsWith(".mp3")) {
-            logger.log(Level.WARNING, "File ignored: " + child.getAbsolutePath());
+            logger.warn("File ignored: " + child.getAbsolutePath());
         }
         AudioFile audioFile = getAudioFile(child);
         if (audioFile == null){
-            logger.log(Level.WARNING, "Error processing file: " + child.getAbsolutePath());
+            logger.warn("Error processing file: " + child.getAbsolutePath());
         } else {
-            result.add(new FileDescriptor(child.getAbsolutePath(), getMetadata(audioFile)));
+            result.add(new FileDescriptor(getHashSum(child), child.getAbsolutePath(), getMetadata(audioFile)));
+        }
+    }
+
+    private String getHashSum(File file) {
+        try {
+            return HashService.createSHA1(Files.readAllBytes(file.toPath()));
+        } catch (IOException| NoSuchAlgorithmException e) {
+            throw new ServiceException(e);
         }
     }
 
@@ -106,7 +121,7 @@ public class AudioExtractorService implements MetadataService {
         try {
             return AudioFileIO.read(child);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Error processing file: " + child.getAbsolutePath() + " " + e.getMessage());
+            logger.warn("Error processing file: " + child.getAbsolutePath() + " " + e.getMessage());
         }
         return null;
     }
