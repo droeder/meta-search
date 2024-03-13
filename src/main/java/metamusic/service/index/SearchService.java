@@ -1,14 +1,10 @@
 package metamusic.service.index;
 
-import metamusic.model.SearchResult;
-
 import java.io.IOException;
+import java.util.List;
 
 public interface SearchService {
 
-    void index(String indexName, AudioFileDescriptor descriptor);
-
-    void close() throws IOException;
-
-    SearchResult search(String indexName, String searchTerm);
+    void index(String indexName, FileDescriptor descriptor);
+    List<FileDescriptor> search(String indexName, String searchTerm);
 }

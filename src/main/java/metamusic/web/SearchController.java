@@ -7,14 +7,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import metamusic.config.Config;
-import metamusic.model.SearchResult;
 import metamusic.service.extract.MetadataService;
-import metamusic.service.index.AudioFileDescriptor;
+import metamusic.service.index.FileDescriptor;
 import metamusic.service.index.SearchService;
 
 import java.util.List;
 
-@Path("/index")
+@Path("/search")
 public class SearchController {
     @Inject
     private SearchService searchService;
@@ -24,9 +23,18 @@ public class SearchController {
     @Inject
     private Config config;
 
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String index() {
+        List<FileDescriptor> fileDescriptors = extractorService.extractMetadata(config.getSourcePaths());
+        fileDescriptors.forEach(descriptor -> searchService.index(config.indexName, descriptor));
+        return "success";
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public SearchResult search(@QueryParam("search") String searchTerm) {
-        return searchService.search(config.elasticIndexName, searchTerm);
+    public List<FileDescriptor> search(@QueryParam("term") String searchTerm) {
+        return searchService.search(config.indexName, searchTerm);
     }
 }

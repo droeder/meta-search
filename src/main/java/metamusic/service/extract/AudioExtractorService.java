@@ -1,7 +1,7 @@
 package metamusic.service.extract;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import metamusic.service.index.AudioFileDescriptor;
+import metamusic.service.index.FileDescriptor;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -22,8 +22,8 @@ public class AudioExtractorService implements MetadataService {
     private static final Logger logger =  Logger.getLogger(AudioExtractorService.class.getName());
 //TODO: maybe use streams for processing all files
     @Override
-    public List<AudioFileDescriptor> extractMetadata(List<Path> sources) {
-        List<AudioFileDescriptor> result = new ArrayList<>();
+    public List<FileDescriptor> extractMetadata(List<Path> sources) {
+        List<FileDescriptor> result = new ArrayList<>();
         for (File source : sources.stream().map(Path::toFile).toList()){
             if (source.isDirectory() && source.canRead()){
                 processDirectory(source, result);
@@ -37,7 +37,7 @@ public class AudioExtractorService implements MetadataService {
         return result;
     }
 
-    private void processDirectory(File source, List<AudioFileDescriptor> result) {
+    private void processDirectory(File source, List<FileDescriptor> result) {
         if (source.isDirectory() && source.canRead()){
             File[] children = source.listFiles();
             if (children != null){
@@ -52,7 +52,7 @@ public class AudioExtractorService implements MetadataService {
         }
     }
 
-    private void processFile(File child, List<AudioFileDescriptor> result) {
+    private void processFile(File child, List<FileDescriptor> result) {
         if (!child.exists()){
             logger.log(Level.WARNING, "File does not exist: " + child.getAbsolutePath());
         }
@@ -63,7 +63,7 @@ public class AudioExtractorService implements MetadataService {
         if (audioFile == null){
             logger.log(Level.WARNING, "Error processing file: " + child.getAbsolutePath());
         } else {
-            result.add(new AudioFileDescriptor(child.getAbsolutePath(), getMetadata(audioFile)));
+            result.add(new FileDescriptor(child.getAbsolutePath(), getMetadata(audioFile)));
         }
     }
 

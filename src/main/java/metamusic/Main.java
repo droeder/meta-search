@@ -1,12 +1,6 @@
 package metamusic;
 
-import metamusic.service.extract.AudioExtractorService;
-import metamusic.service.index.AudioFileDescriptor;
-import metamusic.service.index.ElasticSearchSearchService;
-import metamusic.service.index.SearchService;
-
 import java.nio.file.Path;
-import java.util.List;
 
 public class Main {
     private static final String SERVER_URL = "https://localhost:9200";

@@ -32,7 +32,7 @@ public class ElasticSearchFactory {
     @Produces
     @Singleton
     public SearchService buildWithApiKey() throws IOException {
-        URL elasticUrl = URI.create(config.elasticServerUrl).toURL();
+        URL elasticUrl = URI.create(config.searchServerUrl).toURL();
         SSLContext sslContext = TransportUtils.sslContextFromCaFingerprint(config.elasticFingerPrint);
         RestClient restClient = RestClient
                 .builder(new HttpHost(elasticUrl.getHost(), elasticUrl.getPort(), elasticUrl.getProtocol()))
@@ -44,10 +44,7 @@ public class ElasticSearchFactory {
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         ElasticsearchClient client = new ElasticsearchClient(transport);
         logger.log(INFO, String.format("Connection with client established: %s ", client.info()));
-        ElasticSearchSearchService service = new ElasticSearchSearchService();
-        service.setRestClient(restClient);
-        service.setEsClient(client);
-        return service;
+        return new ElasticSearchSearchService(client);
     }
 
 }

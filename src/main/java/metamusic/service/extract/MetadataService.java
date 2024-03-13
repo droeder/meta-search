@@ -1,11 +1,11 @@
 package metamusic.service.extract;
 
-import metamusic.service.index.AudioFileDescriptor;
+import metamusic.service.index.FileDescriptor;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public interface MetadataService {
 
-    List<AudioFileDescriptor> extractMetadata(List<Path> sources);
+    List<FileDescriptor> extractMetadata(List<Path> sources);
 }
