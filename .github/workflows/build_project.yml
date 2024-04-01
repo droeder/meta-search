@@ -79,23 +79,23 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-    #- name: Build Docker image
-    #  id: build-img
-    #  run: mvn -B quarkus:image-build --file pom.xml
-
-    #- name: Push Docker image
-    #  id: push-img
-    #  run: mvn -B quarkus:image-push --file pom.xml
-      
     - name: mvn clean compile
       run: mvn clean compile
-      
-    - name: mvn package -DskipTests -Dquarkus.container-image.push=true latest
-      if: github.ref == 'refs/heads/main'
-      run: >-
-        mvn package -DskipTests
-        -Dquarkus.container-image.push=true
-        -Dquarkus.container-image.username=${{ github.actor }}
-        -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
-        -Dquarkus.container-image.image=ghcr.io/${{ github.repository }}:latest
-        #'-Dquarkus.container-image.labels."org.opencontainers.image.revision"='$GITHUB_SHA
+    
+    - name: Build Docker image
+      id: build-img
+      run: mvn -B quarkus:image-build --file pom.xml
+
+    - name: Push Docker image
+      id: push-img
+      run: mvn -B quarkus:image-push --file pom.xml
+     
+    #- name: mvn package -DskipTests -Dquarkus.container-image.push=true latest
+    #  if: github.ref == 'refs/heads/main'
+    #  run: >-
+    #    mvn package -DskipTests
+    #    -Dquarkus.container-image.push=true
+    #    -Dquarkus.container-image.username=${{ github.actor }}
+    #    -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
+    #    -Dquarkus.container-image.image=ghcr.io/${{ github.repository }}:latest
+    #    #'-Dquarkus.container-image.labels."org.opencontainers.image.revision"='$GITHUB_SHA
