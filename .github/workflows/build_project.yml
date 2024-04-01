@@ -82,14 +82,9 @@ jobs:
     - name: mvn clean compile
       run: mvn clean compile
 
-#    - name: Build Docker image
-#      id: build-img
-#      run: docker build --
-#
-#    - name: Push Docker image
-#      id: push-img
-#      run: mvn -B quarkus:image-push --file pom.xml
-
+    - name: Build Docker image
+      id: build-img
+      run: mvn -B quarkus:image-build --file pom.xml
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
