@@ -95,4 +95,4 @@ jobs:
         -Dquarkus.container-image.username=${{ github.actor }}
         -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
         -Dquarkus.container-image.image=ghcr.io/${{ github.repository }}:latest
-        '-Dquarkus.container-image.labels."org.opencontainers.image.revision"='$GITHUB_SHA
+        #'-Dquarkus.container-image.labels."org.opencontainers.image.revision"='$GITHUB_SHA
