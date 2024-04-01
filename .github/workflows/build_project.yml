@@ -8,6 +8,9 @@
 
 name: build_project
 
+permissions:
+  packages: write
+
 on:
   push:
     branches: [ "main" ]
