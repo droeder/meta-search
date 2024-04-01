@@ -93,7 +93,7 @@ jobs:
     - name: mvn package -DskipTests -Dquarkus.container-image.push=true latest
       if: github.ref == 'refs/heads/main'
       run: >-
-        $MVN package -DskipTests
+        mvn package -DskipTests
         -Dquarkus.container-image.push=true
         -Dquarkus.container-image.username=${{ github.actor }}
         -Dquarkus.container-image.password=${{ secrets.GITHUB_TOKEN }}
